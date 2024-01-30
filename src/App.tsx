@@ -160,6 +160,8 @@ function App() {
               </div>
             </Card>
 
+            <SendInscription/>
+            <GetInscription/>
             <SignPsbtCard />
             <SignMessageCard />
             <PushTxCard />
@@ -187,7 +189,7 @@ function SignPsbtCard() {
   const [psbtHex, setPsbtHex] = useState("");
   const [psbtResult, setPsbtResult] = useState("");
   return (
-    <Card size="small" title="Sign Psbt" style={{ width: 300, margin: 10 }}>
+    <Card size="small" title="Sign Psbt Default" style={{ width: 300, margin: 10 }}>
       <div style={{ textAlign: "left", marginTop: 10 }}>
         <div style={{ fontWeight: "bold" }}>PsbtHex:</div>
         <Input
@@ -204,12 +206,37 @@ function SignPsbtCard() {
       <Button
         style={{ marginTop: 10 }}
         onClick={async () => {
-          try {
-            const psbtResult = await (window as any).unisat.signPsbt(psbtHex);
+            alert(2);
+
+            let option = {
+                autoFinalized:true,
+                toSignInputs:[
+                    {
+                        index: 0,
+                        // address: "tb1qwgpxds9pxl3c60hk4m9wuls0lenczksrv5j4ah",
+                        address : "tb1pcnzk2f44etdtfpptzf3msd2vhcynmsj4xahhfxplahwukyn8uuzst55d6w"
+                        // address : "tb1pa0xekhxltcz948az72dt00c0e9396dexgv77ml69ag9k0avc649qgyefke",
+                    },
+                    // {
+                    //     index: 0,
+                    //     // publicKey: "02b6bc2ae3c967656973a367d72e1fa2c93c80c6f0637cde7e75623c7f5c89568b",
+                    //     publicKey: "03899966150bb1efc380a483e45530b76cbff3e1aa45fdc3142d6e945b8ec661d4",
+                    //     sighashTypes: [1]
+                    // },
+                ]
+            }
+
+            const psbtResult = await (window as any).unisat.signPsbt(psbtHex,option);
+            // const psbtResult = await (window as any).unisat.signPsbt(content);
             setPsbtResult(psbtResult);
-          } catch (e) {
-            setPsbtResult((e as any).message);
-          }
+
+
+          // try {
+          //   const psbtResult = await (window as any).unisat.signPsbt(psbtHex);
+          //   setPsbtResult(psbtResult);
+          // } catch (e) {
+          //   setPsbtResult((e as any).message);
+          // }
         }}
       >
         Sign Psbt
@@ -241,6 +268,7 @@ function SignMessageCard() {
         onClick={async () => {
           const signature = await (window as any).unisat.signMessage(message);
           setSignature(signature);
+
         }}
       >
         Sign Message
@@ -248,6 +276,69 @@ function SignMessageCard() {
     </Card>
   );
 }
+
+
+function SendInscription() {
+    const [message, setMessage] = useState("hello world~");
+    const [signature, setSignature] = useState("");
+    return (
+        <Card size="small" title="Send Inscription" style={{ width: 300, margin: 10 }}>
+            <div style={{ textAlign: "left", marginTop: 10 }}>
+                <div style={{ fontWeight: "bold" }}>Message:</div>
+                <Input
+                    defaultValue={message}
+                    onChange={(e) => {
+                        setMessage(e.target.value);
+                    }}
+                ></Input>
+            </div>
+            <div style={{ textAlign: "left", marginTop: 10 }}>
+                <div style={{ fontWeight: "bold" }}>Signature:</div>
+                <div style={{ wordWrap: "break-word" }}>{signature}</div>
+            </div>
+            <Button
+                style={{ marginTop: 10 }}
+                onClick={async () => {
+
+                    try {
+                        let {txid} = await (window as any).unisat.sendInscription("tb1qwgpxds9pxl3c60hk4m9wuls0lenczksrv5j4ah","e9b86a063d78cc8a1ed17d291703bcc95bcd521e087ab0c7f1621c9c607def1ai0",{feeRate:15});
+                        console.log("send Inscription 204 to tb1qwgpxds9pxl3c60hk4m9wuls0lenczksrv5j4ah",{txid})
+                    } catch (e) {
+                        console.log(e);
+                    }
+
+
+                }}
+            >
+                Sign Message
+            </Button>
+        </Card>
+    );
+}
+
+function GetInscription() {
+    const [message, setMessage] = useState("hello world~");
+    const [signature, setSignature] = useState("");
+    return (
+        <Card size="small" title="getInscriptions" style={{ width: 300, margin: 10 }}>
+
+            <Button
+                style={{ marginTop: 10 }}
+                onClick={async () => {
+                    try {
+                        let res = await (window as any).unisat.getInscriptions(0,10);
+                        console.log(res)
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }}
+            >
+                Sign Message
+            </Button>
+        </Card>
+    );
+}
+
 
 function PushTxCard() {
   const [rawtx, setRawtx] = useState("");
